@@ -1,0 +1,13 @@
+body {
+    margin: 0;
+    background: #222;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+#gameCanvas {
+    display: block;
+    margin: 20px auto;
+    background: #6b8c42;
+    border: 4px solid #4a6128;
+}
