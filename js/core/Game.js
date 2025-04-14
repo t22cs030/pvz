@@ -3,6 +3,8 @@ import { Plant } from '../entities/Plant.js';
 import { Zombie } from '../entities/Zombie.js';
 import { CollisionSystem } from '../systems/Collision.js';
 import { Pea } from '../entities/Projectile.js';
+import { PlantFactory } from '../factories/PlantFactory.js';
+import { Sun } from '../entities/Sun.js';
 
 
 export class Game {
@@ -15,6 +17,9 @@ export class Game {
         this.entities = [];
         this.grid = Array(5).fill().map(() => Array(9).fill(null));
         this.resources = 100;
+        this.suns = [];
+        this.mousePos = { x: 0, y: 0 };
+        this.setupSunListeners();
         
         // 先创建实体，再启动游戏循环
         this.setupTestScene(); 
@@ -53,6 +58,26 @@ export class Game {
         });
         
         console.log("测试场景已加载：3植物 + 5僵尸");
+
+        // 测试阳光
+        this.suns.push(new Sun(100, -50));
+        this.suns.push(new Sun(200, -50));
+        
+        // 测试工厂创建
+        this.entities.push(
+            PlantFactory.create('sunflower', 2, 2, this),
+            PlantFactory.create('peashooter', 3, 4, this)
+        );
+    }
+
+    setupSunListeners() {
+        this.canvas.addEventListener('mousemove', (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            this.mousePos = {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        });
     }
 
     gameLoop(timestamp) {
@@ -71,6 +96,15 @@ export class Game {
         
         // 移除超出边界的实体
         this.cleanupEntities();
+
+        // 阳光系统更新
+        this.suns.forEach((sun, index) => {
+            sun.update();
+            if (sun.checkCollect(this.mousePos)) {
+                this.resources += sun.collect();
+                this.suns.splice(index, 1);
+            }
+        });
     }
 
     render() {
@@ -92,6 +126,13 @@ export class Game {
             entity.y - 15
         );
     });
+
+    // 渲染阳光
+    this.suns.forEach(sun => sun.render(this.ctx));
+        
+    // 调试显示鼠标位置
+    ctx.fillStyle = 'white';
+    ctx.fillText(`Mouse: ${this.mousePos.x},${this.mousePos.y}`, 10, 20);
     }
 
     setupEventListeners() {
