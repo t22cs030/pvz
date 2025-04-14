@@ -3,7 +3,7 @@ import { Entity } from '../core/Entity.js';
 export class Pea extends Entity {
     constructor(x, y) {
         super(x, y);
-        this.speed = 5;
+        this.speed = 2.5;
         this.damage = 20;
         this.width = 15;
         this.height = 15;

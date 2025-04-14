@@ -37,21 +37,10 @@ export class Game {
        // 清空现有实体
         this.entities = [];
         
-        // 测试植物
-        const testPlants = [
-            { type: 'peashooter', row: 2, col: 2 },
-            { type: 'sunflower', row: 0, col: 0 },
-            { type: 'wallnut', row: 4, col: 4 }
-        ];
-        
         // 测试僵尸
         const testZombies = [0, 1, 2, 3, 4]; // 每行一个僵尸
         
         // 创建实体
-        testPlants.forEach(p => {
-            this.entities.push(new Plant(p.type, p.row, p.col,this));
-            this.grid[p.row][p.col] = p.type; // 更新网格状态
-        });
         
         testZombies.forEach(row => {
             this.entities.push(new Zombie(row,this));
@@ -108,31 +97,21 @@ export class Game {
     }
 
     render() {
-        // 清空画布时保留上一帧内容（调试用）
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    
-    // 强制绘制所有实体的调试信息
-    this.entities.forEach(entity => {
-        entity.render(this.ctx); // 正常渲染
+        // 正确使用this.ctx
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // 实体类型标签
+        // 所有其他渲染操作也要用this.ctx
+        this.entities.forEach(entity => {
+            entity.render(this.ctx); // 传递ctx给实体
+        });
+        
+        // 阳光渲染
+        this.suns.forEach(sun => sun.render(this.ctx));
+        
+        // 调试信息（可选）
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '12px Arial';
-        this.ctx.fillText(
-            `${entity.constructor.name}`, 
-            entity.x - 30, 
-            entity.y - 15
-        );
-    });
-
-    // 渲染阳光
-    this.suns.forEach(sun => sun.render(this.ctx));
-        
-    // 调试显示鼠标位置
-    ctx.fillStyle = 'white';
-    ctx.fillText(`Mouse: ${this.mousePos.x},${this.mousePos.y}`, 10, 20);
+        this.ctx.font = '16px Arial';
+        this.ctx.fillText(`阳光: ${this.resources}`, 20, 30);
     }
 
     setupEventListeners() {
