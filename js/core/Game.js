@@ -96,10 +96,28 @@ export class Game {
             }
         });
 
-        this.zombieAndPlantCollision();
+        this.handleCollisions();
     }
 
     render() {
+        // 绘制网格线（调试用）
+    this.ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 9; col++) {
+            this.ctx.strokeRect(col * 80, row * 80, 80, 80);
+        }
+    }
+
+    // 绘制实体碰撞框
+    this.entities.forEach(e => {
+        this.ctx.strokeStyle = 'red';
+        this.ctx.strokeRect(
+            e.x - e.width/2, 
+            e.y - e.height/2, 
+            e.width, 
+            e.height
+        );
+    });
         // 正确使用this.ctx
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
@@ -128,48 +146,25 @@ export class Game {
     }
 
     handleCollisions() {
-        const collisions = CollisionSystem.checkAll(this.entities);
-        
-        collisions.forEach(({ pea, zombie, plant }) => {
-            // 子弹伤害处理
-            if (pea && zombie) {
-                zombie.health -= pea.damage;
-                pea.toRemove = true;
-                console.log(`子弹命中! 僵尸血量: ${zombie.health}`);
-            }
-            
-            // 僵尸攻击处理
-            if (zombie && plant) {
-                plant.health -= zombie.damage;
-                zombie.speed = 0; // 停止移动
-                console.log(`僵尸攻击! 植物血量: ${plant.health}`);
-                
-                // 植物死亡处理
-                if (plant.health <= 0) {
-                    plant.toRemove = true;
-                    this.grid[plant.row][plant.col] = null;
-                    zombie.speed = 0.5; // 恢复移动
-                }
-            }
-        });
-    }
-
-    zombieAndPlantCollision() {
-        // 僵尸与植物碰撞
+        // 碰撞
+        const bullets = this.entities.filter(e => e instanceof Pea);
         const zombies = this.entities.filter(e => e instanceof Zombie);
-        const collisions = CollisionSystem.checkZombiePlantCollision(zombies, this.grid);
-        
-        collisions.forEach(({ zombie, plant, col }) => {
+        const bulletHits = CollisionSystem.checkBulletZombie(bullets, zombies);
+
+        bulletHits.forEach(({ bullet, zombie }) => {
+            zombie.health -= bullet.damage;
+            bullet.toRemove = true;
+        });
+
+        // 僵尸-植物碰撞（网格检测）
+        const gridHits = CollisionSystem.checkZombiePlantCollision(zombies, this.grid);
+        gridHits.forEach(({ zombie, plant, col }) => {
             zombie.isAttacking = true;
-            zombie.x = (col + 1) * 80 - 30; // 对齐到格子边界
+            zombie.x = (col + 1) * 80 - 30; // 对齐网格
             
             if (zombie.attackCooldown <= 0) {
-                plant.health -= zombie.attackDamage;
+                plant.health -= 0.5;
                 zombie.attackCooldown = 30;
-                
-                if (plant.health <= 0) {
-                    this.grid[zombie.row][col] = null;
-                }
             }
         });
     }

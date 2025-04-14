@@ -7,6 +7,8 @@ export class Plant {
         this.game = game;
         this.health = 100;
         this.config = config;
+        this.width = 60;
+        this.height = 70;
     }
 
     // 子类需要实现的方法

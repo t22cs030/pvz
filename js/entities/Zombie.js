@@ -20,41 +20,40 @@ export class Zombie extends Entity {
         const plant = this.game.grid[this.row][col];
         
         if (plant) {
-            this.isAttacking = true;
-            if (this.attackCooldown <= 0) {
-                plant.health -= this.attackDamage;
-                this.attackCooldown = 30; // 0.5秒攻击间隔
-                
-                if (plant.health <= 0) {
-                    this.game.grid[this.row][col] = null;
-                    this.isAttacking = false;
-                }
-            }
+            this.handleAttack(plant, col);
         } else {
+            this.x -= this.speed;
             this.isAttacking = false;
-            this.x -= this.speed; // 正常移动
         }
-        
-        this.attackCooldown--;
     }
 
     render(ctx) {
-        // 绘制僵尸
-        ctx.fillStyle = this.isAttacking ? '#ff0000' : '#8B4513'; // 攻击时变红
+        // 绘制僵尸主体
+        ctx.fillStyle = 'gray';
         ctx.fillRect(this.x - 30, this.y - 40, 60, 80);
-        
-        // 血条
+
+        // 血条背景
         ctx.fillStyle = 'red';
         ctx.fillRect(this.x - 30, this.y - 50, 60, 5);
+        
+        // 当前血量
         ctx.fillStyle = 'green';
         ctx.fillRect(this.x - 30, this.y - 50, 60 * (this.health / 100), 5);
+    }
+
+    handleAttack(plant, col) {
+        this.isAttacking = true;
+        this.x = (col + 1) * 80 - 30; // 对齐到格子边界
         
-        // 调试信息
-        if (this.game.debugMode) {
-            ctx.fillStyle = 'white';
-            ctx.font = '10px Arial';
-            ctx.fillText(`ATK:${this.isAttacking}`, this.x - 20, this.y - 55);
+        if (this.attackCooldown <= 0) {
+            plant.health -= this.attackDamage;
+            this.attackCooldown = 30;
+            
+            if (plant.health <= 0) {
+                this.game.grid[this.row][col] = null;
+            }
         }
+        this.attackCooldown--;
     }
 
 }

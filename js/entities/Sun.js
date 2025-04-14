@@ -2,16 +2,20 @@ export class Sun {
     constructor(x, y, isFalling = true) {
         this.x = x;
         this.y = y;
-        this.width = 40;
-        this.height = 40;
-        this.speed = isFalling ? 0.5 : 0;
-        this.value = 25;
-        this.collected = false;
-        this.alpha = 1.0; // 用于淡出动画
+        this.targetY = y + 500; // 下落终点
+        this.isFalling = isFalling;
+        this.hasStopped = false;
+        this.speed = 2;
+        this.value = 25; // 阳光的价值
     }
 
     update() {
-        this.y += this.speed;
+        if (this.isFalling && !this.hasStopped) {
+            this.y += this.speed;
+            if (this.y >= this.targetY) {
+                this.hasStopped = true;
+            }
+        }
     }
 
     checkCollect(mousePos) {

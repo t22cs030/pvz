@@ -30,4 +30,16 @@ export class CollisionSystem {
         
         return collisions;
     }
+
+    static checkBulletZombie(bullets, zombies) {
+        const hits = [];
+        bullets.forEach(bullet => {
+            zombies.forEach(zombie => {
+                if (this.check(bullet, zombie)) {
+                    hits.push({ bullet, zombie });
+                }
+            });
+        });
+        return hits;
+    }
 }
