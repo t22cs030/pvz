@@ -4,7 +4,7 @@ export class Sun {
         this.y = y;
         this.width = 40;
         this.height = 40;
-        this.speed = isFalling ? 2 : 0;
+        this.speed = isFalling ? 0.5 : 0;
         this.value = 25;
         this.collected = false;
         this.alpha = 1.0; // 用于淡出动画

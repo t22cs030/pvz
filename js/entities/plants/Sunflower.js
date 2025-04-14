@@ -17,7 +17,14 @@ export class Sunflower extends Plant {
                     false // 不是下落阳光
                 )
             );
-            this.produceTimer = 300;
+            this.produceTimer = 1500;
         }
+    }
+
+    render(ctx) {
+        ctx.fillStyle = 'yellow';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 30, 0, Math.PI * 2);
+        ctx.fill();
     }
 }

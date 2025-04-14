@@ -4,7 +4,7 @@ export class Zombie extends Entity {
     constructor(row, gameRef ) {
         super(750, row * 80 + 40);
         this.row = row;
-        this.speed = 0.5;
+        this.speed = 0.1;
         this.health = 100;
         this.damage = 0.5;
         this.width = 50;

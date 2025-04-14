@@ -1,4 +1,6 @@
 import { Plant } from '../Plant.js';
+import { Pea } from '../Projectile.js';
+
 
 export class Peashooter extends Plant {
     constructor(row, col, game, config) {
@@ -11,7 +13,7 @@ export class Peashooter extends Plant {
             this.game.entities.push(
                 new Pea(this.x + 20, this.y, this.row)
             );
-            this.attackTimer = 60;
+            this.attackTimer = 200;
         }
     }
 
