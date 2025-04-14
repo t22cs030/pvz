@@ -1,5 +1,6 @@
 import { Peashooter } from '../entities/plants/Peashooter.js';
 import { Sunflower } from '../entities/plants/Sunflower.js';
+import { Wallnut } from '../entities/plants/Wallnut.js';
 
 export class PlantFactory {
     static PLANT_TYPES = {
@@ -12,7 +13,13 @@ export class PlantFactory {
             class: Sunflower,
             cost: 50,
             texture: 'sunflower.png'
+        },
+        wallnut: {
+            class: Wallnut,
+            cost: 50,
+            texture: 'wallnut.png'
         }
+
     };
 
     static create(type, row, col, game) {

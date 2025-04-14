@@ -55,7 +55,8 @@ export class Game {
         // 测试工厂创建
         this.entities.push(
             PlantFactory.create('sunflower', 2, 2, this),
-            PlantFactory.create('peashooter', 3, 4, this)
+            PlantFactory.create('peashooter', 3, 4, this),
+            PlantFactory.create('wallnut', 4, 8, this)
         );
     }
 
