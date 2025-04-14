@@ -2,53 +2,59 @@ import { Entity } from '../core/Entity.js';
 
 export class Zombie extends Entity {
     constructor(row, gameRef ) {
-        super(750, row * 80 + 40);
+        super(800, row * 80 + 40);
         this.row = row;
         this.speed = 0.1;
         this.health = 100;
-        this.damage = 0.5;
         this.width = 50;
         this.height = 80;
         this.game = gameRef; // 保存引用
+        this.attackCooldown = 0;
+        this.attackDamage = 0.5; // 每次攻击伤害
+        this.isAttacking = false;
     }
 
     update() {
-        this.x -= this.speed;
-        if (this.x < 0) this.game.gameOver(); // 通过引用访问
-        if (this.health <= 0) this.toRemove = true;
+        // 检测前方植物
+        const col = Math.floor(this.x / 80);
+        const plant = this.game.grid[this.row][col];
+        
+        if (plant) {
+            this.isAttacking = true;
+            if (this.attackCooldown <= 0) {
+                plant.health -= this.attackDamage;
+                this.attackCooldown = 30; // 0.5秒攻击间隔
+                
+                if (plant.health <= 0) {
+                    this.game.grid[this.row][col] = null;
+                    this.isAttacking = false;
+                }
+            }
+        } else {
+            this.isAttacking = false;
+            this.x -= this.speed; // 正常移动
+        }
+        
+        this.attackCooldown--;
     }
 
     render(ctx) {
-        ctx.fillStyle = 'gray';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 30, 0, Math.PI*2);
-        ctx.fill();
+        // 绘制僵尸
+        ctx.fillStyle = this.isAttacking ? '#ff0000' : '#8B4513'; // 攻击时变红
+        ctx.fillRect(this.x - 30, this.y - 40, 60, 80);
+        
         // 血条
         ctx.fillStyle = 'red';
-        ctx.fillRect(this.x - 25, this.y - 50, 50, 5);
+        ctx.fillRect(this.x - 30, this.y - 50, 60, 5);
         ctx.fillStyle = 'green';
-        ctx.fillRect(this.x - 25, this.y - 50, 50 * (this.health/100), 5);
-    }
-
-    get hitbox() {
-        return {
-            x: this.x - this.width/2, // 中心坐标转左上角
-            y: this.y - this.height/2,
-            width: this.width,
-            height: this.height
-        };
-    }
-    
-    // 在碰撞检测时使用hitbox
-    static check(a, b) {
-        const aBox = a.hitbox;
-        const bBox = b.hitbox;
-        return (
-            aBox.x < bBox.x + bBox.width &&
-            aBox.x + aBox.width > bBox.x &&
-            aBox.y < bBox.y + bBox.height &&
-            aBox.y + aBox.height > bBox.y
-        );
+        ctx.fillRect(this.x - 30, this.y - 50, 60 * (this.health / 100), 5);
+        
+        // 调试信息
+        if (this.game.debugMode) {
+            ctx.fillStyle = 'white';
+            ctx.font = '10px Arial';
+            ctx.fillText(`ATK:${this.isAttacking}`, this.x - 20, this.y - 55);
+        }
     }
 
 }

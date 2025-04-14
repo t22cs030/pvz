@@ -95,6 +95,8 @@ export class Game {
                 this.suns.splice(index, 1);
             }
         });
+
+        this.zombieAndPlantCollision();
     }
 
     render() {
@@ -147,6 +149,26 @@ export class Game {
                     plant.toRemove = true;
                     this.grid[plant.row][plant.col] = null;
                     zombie.speed = 0.5; // 恢复移动
+                }
+            }
+        });
+    }
+
+    zombieAndPlantCollision() {
+        // 僵尸与植物碰撞
+        const zombies = this.entities.filter(e => e instanceof Zombie);
+        const collisions = CollisionSystem.checkZombiePlantCollision(zombies, this.grid);
+        
+        collisions.forEach(({ zombie, plant, col }) => {
+            zombie.isAttacking = true;
+            zombie.x = (col + 1) * 80 - 30; // 对齐到格子边界
+            
+            if (zombie.attackCooldown <= 0) {
+                plant.health -= zombie.attackDamage;
+                zombie.attackCooldown = 30;
+                
+                if (plant.health <= 0) {
+                    this.grid[zombie.row][col] = null;
                 }
             }
         });

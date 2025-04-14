@@ -15,5 +15,11 @@ export class Plant {
         // 默认绘制调试矩形
         ctx.strokeStyle = 'green';
         ctx.strokeRect(this.x - 30, this.y - 30, 60, 60);
+        // 血条渲染
+        ctx.fillStyle = 'red';
+        ctx.fillRect(this.x - 30, this.y - 45, 60, 5);
+        ctx.fillStyle = 'green';
+        ctx.fillRect(this.x - 30, this.y - 45, 60 * (this.health / 100), 5);
+        
     }
 }

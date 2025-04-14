@@ -3,32 +3,31 @@ import { Plant } from '../entities/Plant.js';
 import { Pea } from '../entities/Projectile.js';
 
 export class CollisionSystem {
-    static check(a, b) {
-        const aBox = a.hitbox || a;
-        const bBox = b.hitbox || b;
-        
+    static check(entity1, entity2) {
         return (
-            aBox.x < bBox.x + bBox.width &&
-            aBox.x + aBox.width > bBox.x &&
-            aBox.y < bBox.y + bBox.height &&
-            aBox.y + aBox.height > bBox.y
+            entity1.x < entity2.x + entity2.width &&
+            entity1.x + entity1.width > entity2.x &&
+            entity1.y < entity2.y + entity2.height &&
+            entity1.y + entity1.height > entity2.y
         );
     }
 
-    static checkAll(entities) {
-        const peas = entities.filter(e => e instanceof Pea);
-        const zombies = entities.filter(e => e instanceof Zombie);
+    static checkZombiePlantCollision(zombies, grid) {
         const collisions = [];
-
-        // 豌豆 vs 僵尸
-        peas.forEach(pea => {
-            zombies.forEach(zombie => {
-                if (this.check(pea, zombie)) {
-                    collisions.push({ pea, zombie });
-                }
-            });
+        
+        zombies.forEach(zombie => {
+            const col = Math.floor(zombie.x / 80);
+            const plant = grid[zombie.row][col];
+            
+            if (plant) {
+                collisions.push({
+                    zombie,
+                    plant,
+                    col
+                });
+            }
         });
-
+        
         return collisions;
     }
 }
